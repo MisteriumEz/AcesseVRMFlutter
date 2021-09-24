@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: const InitialScreen(),
-        initialRoute: temDados! ? '/Home' : '/Login',
+        initialRoute: '/Initial', //temDados == //null ? '/Home' : '/Initial',
         //Rotas nomeadas da aplicação.
         routes: <String, WidgetBuilder>{
           '/Home': (context) => MyHomePage(),

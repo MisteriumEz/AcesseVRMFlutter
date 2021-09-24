@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -11,6 +13,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final Completer<WebViewController> _controller =
+      Completer<WebViewController>();
+
   void _incrementCounter() {
     setState(() {});
   }
@@ -32,9 +37,34 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: WebView(
-        initialUrl: widget.url,
-      ),
+      body: Builder(builder: (BuildContext context) {
+        return WebView(
+          initialUrl: widget.url,
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController) {
+            _controller.complete(webViewController);
+          },
+          onProgress: (int progress) {
+            print("WebView is loading (progress : $progress%)");
+            print(WebView().userAgent);
+          },
+          navigationDelegate: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.youtube.com/')) {
+              print('blocking navigation to $request}');
+              return NavigationDecision.prevent;
+            }
+            print('allowing navigation to $request');
+            return NavigationDecision.navigate;
+          },
+          onPageStarted: (String url) {
+            print('Page started loading: $url');
+          },
+          onPageFinished: (String url) {
+            print('Page finished loading: $url');
+          },
+          gestureNavigationEnabled: true,
+        );
+      }),
     );
   }
 

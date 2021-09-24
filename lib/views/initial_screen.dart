@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:acesse_vrm_flutter/views/home_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ class InitialScreen extends StatefulWidget {
 }
 
 class _InitialScreenState extends State<InitialScreen> {
+  var endereco;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,6 +46,7 @@ class _InitialScreenState extends State<InitialScreen> {
                 onPressed: () {},
                 child: Icon(
                   Icons.qr_code_scanner,
+                  size: 80,
                 ),
               ),
             ),
@@ -64,6 +67,14 @@ class _InitialScreenState extends State<InitialScreen> {
       );
 
       if (!mounted) return;
+      endereco = qrCode;
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => MyHomePage(
+              url: qrCode,
+            ),
+          ),
+          (route) => false);
       print(qrCode);
       setState(() {});
     } on PlatformException {
