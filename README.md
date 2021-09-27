@@ -1,6 +1,5 @@
-# acesse_vrm_flutter
+# VRM
 
-A new Flutter project.
 
 ## Getting Started
 
