@@ -4,22 +4,29 @@ import 'package:flutter/material.dart';
 import 'views/home_screen.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key, this.temDados}) : super(key: key);
-  final bool? temDados;
+  const MyApp({Key? key, this.urlSalva, this.usuario, this.senha})
+      : super(key: key);
+  final String? urlSalva, usuario, senha;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Acesse VRM',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const InitialScreen(),
-        initialRoute: '/Initial', //temDados == //null ? '/Home' : '/Initial',
+        home: urlSalva == null
+            ? const InitialScreen()
+            : MyHomePage(
+                url: urlSalva,
+                usuario: usuario,
+                senha: senha,
+              ),
         //Rotas nomeadas da aplicação.
         routes: <String, WidgetBuilder>{
-          '/Home': (context) => MyHomePage(),
-          '/Initial': (context) => InitialScreen(),
+          '/Home': (context) => const MyHomePage(),
+          '/Initial': (context) => const InitialScreen(),
         });
   }
 }

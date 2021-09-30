@@ -1,8 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.acesse_vrm_flutter">
+    package="com.brasilsoftware.acesse_vrm">
+
+        <uses-permission android:name="android.permission.INTERNET" />   
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    
+    
    <application
-        android:label="acesse_vrm_flutter"
-        android:icon="@mipmap/ic_launcher">
+        android:label="VRM"
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+        
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -37,5 +45,24 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+    <provider  
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.provider" 
+        android:exported="false"
+        android:grantUriPermissions="true">
+       <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/provider_paths"/>
+    </provider>
+    <provider       
+        android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"
+        android:authorities="${applicationId}.flutter_downloader.provider"
+   
+        android:exported="false"
+        android:grantUriPermissions="true">
+       <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/provider_paths"/>
+    </provider>
     </application>
 </manifest>
