@@ -15,9 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:whatsapp_share2/whatsapp_share2.dart';
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:whatsapp_share2/whatsapp_share2.dart';
 
 import 'lost_net_screen.dart';
 
@@ -30,8 +28,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final Completer<WebViewController> _controller =
-      Completer<WebViewController>();
   String? urlAtiva, usuario, senha;
   final GlobalKey webViewKey = GlobalKey();
 
@@ -189,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               _colocaNumero(mensagemResposta);
 
                               print(
-                                  "ME CHAMARAM PARA ENVIARUM ITEM $mensagemJson");
+                                  "ME CHAMARAM PARA ENVIAR UM ITEM $mensagemResposta");
                             });
 
                         webViewController = controller;
@@ -293,8 +289,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   ///Void que coloca o número do Whatsapp e envia o item para o mesmo número
-  void _colocaNumero(mensagem) {
-    var numeroZapController = MaskedTextController(mask: "(00)00000-0000");
+  void _colocaNumero(String mensagem) {
+    var numeroZapController = MaskedTextController(mask: "(00)0000-00000");
+
+    int? contador;
 
     showDialog(
       context: context,
@@ -312,17 +310,27 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.all(8),
                 child: TextFormField(
                   keyboardType: TextInputType.number,
-                  controller: numeroZapController,
                   decoration: InputDecoration(
                       hintText: "Insira aqui o número para que deseja enviar"),
                   maxLength: 14,
                   validator: (value) {
-                    if (value!.length < 14) {
+                    if (value!.length < 13) {
                       return "Número muito curto";
                     } else {
+                      if (value.length == 13) {
+                        if (contador == 14) {
+                          numeroZapController.updateMask("(00)0000-00000");
+                        } else {
+                          numeroZapController.updateMask("(00)00000-0000");
+                        }
+                      } else if (value.length == 14) {
+                        numeroZapController.updateMask("(00)0000-00000");
+                        contador = value.length;
+                      }
                       return null;
                     }
                   },
+                  controller: numeroZapController,
                 ),
               ),
               actions: <Widget>[
@@ -335,7 +343,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               .replaceAll("(", "")
                               .replaceAll(")", "")
                               .replaceAll("-", ""),
-                          mensagem);
+                          mensagem.replaceAll(" ", "%20"));
                       Navigator.of(context).pop();
                     }
                   },
@@ -453,10 +461,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> shareFileViaZap(String path) async {
     var telefone = '75';
     print(path);
-    await WhatsappShare.shareFile(
+    /*  await WhatsappShare.shareFile(
       phone: "55$telefone",
       filePath: [path],
-    );
+    );*/
   }
 
   _downloadTask(urlDownload) async {
