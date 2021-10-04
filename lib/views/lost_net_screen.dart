@@ -24,6 +24,12 @@ class _SemInternetState extends State<SemInternet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        child: Container(
+          color: headerErrorColor,
+        ),
+        preferredSize: Size.fromHeight(0.0),
+      ),
       body: noNotesUI(context),
       floatingActionButton: FloatingActionButton(
         backgroundColor: headerErrorColor,

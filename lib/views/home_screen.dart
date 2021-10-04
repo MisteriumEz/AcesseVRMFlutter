@@ -320,6 +320,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       if (value.length == 13) {
                         if (contador == 14) {
                           numeroZapController.updateMask("(00)0000-00000");
+                          contador == value.length;
+                          print("TO MALUCO PIVETE $contador");
                         } else {
                           numeroZapController.updateMask("(00)00000-0000");
                         }
@@ -327,6 +329,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         numeroZapController.updateMask("(00)0000-00000");
                         contador = value.length;
                       }
+                      contador = value.length;
+                      print(contador);
                       return null;
                     }
                   },
@@ -451,10 +455,10 @@ class _MyHomePageState extends State<MyHomePage> {
     var output = Platform.isAndroid
         ? await getExternalStorageDirectory()
         : await getApplicationDocumentsDirectory();
-    final file = File("${output!.path}/$nomeArquivo.pdf");
+    final file = File("${output!.path}/${nomeArquivo}_orcamento.pdf");
     await file.writeAsBytes(bytes.buffer.asUint8List());
     setState(() {});
-    return "${output.path}/$nomeArquivo.pdf";
+    return "${output.path}/${nomeArquivo}_orcamento.pdf";
   }
 
   ///Compartilha o arquivo via Zap sem precisar do contato salvo
