@@ -15,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-//import 'package:whatsapp_share2/whatsapp_share2.dart';
+import 'package:whatsapp_share2/whatsapp_share2.dart';
 
 import 'lost_net_screen.dart';
 
@@ -291,6 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ///Void que coloca o número do Whatsapp e envia o item para o mesmo número
   void _colocaNumero(String mensagem) {
     var numeroZapController = MaskedTextController(mask: "(00)0000-00000");
+    var focus = FocusNode();
 
     int? contador;
 
@@ -308,33 +309,33 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               content: Padding(
                 padding: EdgeInsets.all(8),
-                child: TextFormField(
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                      hintText: "Insira aqui o número para que deseja enviar"),
-                  maxLength: 14,
-                  validator: (value) {
-                    if (value!.length < 13) {
-                      return "Número muito curto";
-                    } else {
-                      if (value.length == 13) {
-                        if (contador == 14) {
-                          numeroZapController.updateMask("(00)0000-00000");
-                          contador == value.length;
-                          print("TO MALUCO PIVETE $contador");
-                        } else {
-                          numeroZapController.updateMask("(00)00000-0000");
-                        }
-                      } else if (value.length == 14) {
-                        numeroZapController.updateMask("(00)0000-00000");
-                        contador = value.length;
-                      }
-                      contador = value.length;
-                      print(contador);
-                      return null;
+                child: KeyboardListener(
+                  focusNode: focus,
+                  onKeyEvent: (value) {
+                    if (value.logicalKey.keyLabel == "Backspace") {
+                      numeroZapController.updateMask("(00)0000-00000");
                     }
                   },
-                  controller: numeroZapController,
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        hintText:
+                            "Insira aqui o número para que deseja enviar"),
+                    maxLength: 14,
+                    validator: (value) {
+                      if (value!.length < 13) {
+                        return "Número muito curto";
+                      } else {
+                        if (value.length == 13) {
+                          numeroZapController.updateMask("(00)00000-0000");
+                        }
+                        contador = value.length;
+                        print(contador);
+                        return null;
+                      }
+                    },
+                    controller: numeroZapController,
+                  ),
                 ),
               ),
               actions: <Widget>[
@@ -461,14 +462,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return "${output.path}/${nomeArquivo}_orcamento.pdf";
   }
 
-  ///Compartilha o arquivo via Zap sem precisar do contato salvo
+  ///Compartilha o arquivo via Zap sem precisar do contato salvo = SÓ ANDROID
   Future<void> shareFileViaZap(String path) async {
     var telefone = '75';
     print(path);
-    /*  await WhatsappShare.shareFile(
+    await WhatsappShare.shareFile(
       phone: "55$telefone",
       filePath: [path],
-    );*/
+    );
   }
 
   _downloadTask(urlDownload) async {
