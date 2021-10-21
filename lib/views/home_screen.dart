@@ -14,6 +14,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_share2/whatsapp_share2.dart';
 
@@ -166,6 +167,37 @@ class _MyHomePageState extends State<MyHomePage> {
                               var arquivoJson = json.decode(arquivo[0]);
                               var arquivoResposta = arquivoJson['arquivo'];
                               createPdf(arquivoResposta).then((value) {
+                                shareFileViaZap(value);
+                              });
+                              //var decoded =
+                              //  utf8.decode(base64.decode(numeroMetodo));
+                              print(
+                                  "ME CHAMARAM PRA DECODIFICAR UM PDF $arquivoJson");
+                            });
+
+                        ///Compartilha o pdf via Share Sheet da Venda Rápida
+                        controller.addJavaScriptHandler(
+                            handlerName: "compartilharOutrasOpcoesVenda",
+                            callback: (arquivo) {
+                              var arquivoJson = json.decode(arquivo[0]);
+                              var arquivoResposta = arquivoJson['arquivo'];
+                              createPdf(arquivoResposta, true).then((value) {
+                                Share.shareFiles([value]);
+                                print("Acabou o sossego meu mano");
+                              });
+                              //var decoded =
+                              //  utf8.decode(base64.decode(numeroMetodo));
+                              print(
+                                  "ME CHAMARAM PRA DECODIFICAR UM PDF $arquivoJson");
+                            });
+
+                        ///Compartilha o pdf via Whatsapp da Venda Rápida
+                        controller.addJavaScriptHandler(
+                            handlerName: "compartilharViaWhatsVenda",
+                            callback: (arquivo) {
+                              var arquivoJson = json.decode(arquivo[0]);
+                              var arquivoResposta = arquivoJson['arquivo'];
+                              createPdf(arquivoResposta, true).then((value) {
                                 shareFileViaZap(value);
                               });
                               //var decoded =
@@ -450,16 +482,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   ///Cria o PDF decodificando o base64 que vem do VRM
-  Future<String> createPdf(String retornoServidor) async {
-    var nomeArquivo = retornoServidor.substring(1, 10);
+  Future<String> createPdf(String retornoServidor, [bool? itsVenda]) async {
+    //var nomeArquivo = Uuid().v4();
+    var nomeArquivo =
+        DateTime.now().toString().replaceAll(RegExp(r'[^0-9]'), '');
+    //var nomeArquivo = retornoServidor.substring(1, 10);
     var bytes = base64Decode(retornoServidor);
     var output = Platform.isAndroid
         ? await getExternalStorageDirectory()
         : await getApplicationDocumentsDirectory();
-    final file = File("${output!.path}/${nomeArquivo}_orcamento.pdf");
+    //Aqui vai o ponto para trnasformar em orçamento ou em venda rapida.
+    final file = itsVenda == null
+        ? File("${output!.path}/${nomeArquivo}_orcamento.pdf")
+        : File("${output!.path}/${nomeArquivo}_venda.pdf");
     await file.writeAsBytes(bytes.buffer.asUint8List());
     setState(() {});
-    return "${output.path}/${nomeArquivo}_orcamento.pdf";
+    return itsVenda == null
+        ? "${output.path}/${nomeArquivo}_orcamento.pdf"
+        : "${output.path}/${nomeArquivo}_venda.pdf";
   }
 
   ///Compartilha o arquivo via Zap sem precisar do contato salvo = SÓ ANDROID
