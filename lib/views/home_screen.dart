@@ -15,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsapp_share2/whatsapp_share2.dart';
+//import 'package:whatsapp_share2/whatsapp_share2.dart';
 
 import 'lost_net_screen.dart';
 
@@ -174,6 +174,37 @@ class _MyHomePageState extends State<MyHomePage> {
                                   "ME CHAMARAM PRA DECODIFICAR UM PDF $arquivoJson");
                             });
 
+                        ///Compartilha o pdf via Share Sheet da Venda Rápida
+                        controller.addJavaScriptHandler(
+                            handlerName: "compartilharOutrasOpcoesVenda",
+                            callback: (arquivo) {
+                              var arquivoJson = json.decode(arquivo[0]);
+                              var arquivoResposta = arquivoJson['arquivo'];
+                              createPdf(arquivoResposta, true).then((value) {
+                                Share.shareFiles([value]);
+                                print("Acabou o sossego meu mano");
+                              });
+                              //var decoded =
+                              //  utf8.decode(base64.decode(numeroMetodo));
+                              print(
+                                  "ME CHAMARAM PRA DECODIFICAR UM PDF $arquivoJson");
+                            });
+
+                        ///Compartilha o pdf via Whatsapp da Venda Rápida
+                        controller.addJavaScriptHandler(
+                            handlerName: "compartilharViaWhatsVenda",
+                            callback: (arquivo) {
+                              var arquivoJson = json.decode(arquivo[0]);
+                              var arquivoResposta = arquivoJson['arquivo'];
+                              createPdf(arquivoResposta, true).then((value) {
+                                shareFileViaZap(value);
+                              });
+                              //var decoded =
+                              //  utf8.decode(base64.decode(numeroMetodo));
+                              print(
+                                  "ME CHAMARAM PRA DECODIFICAR UM PDF $arquivoJson");
+                            });
+
                         ///Compartilha o item via Whatsapp
                         controller.addJavaScriptHandler(
                             handlerName: "compartilharItem",
@@ -312,6 +343,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: KeyboardListener(
                   focusNode: focus,
                   onKeyEvent: (value) {
+                    print(value);
                     if (value.logicalKey.keyLabel == "Backspace") {
                       numeroZapController.updateMask("(00)0000-00000");
                     }
@@ -324,10 +356,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     maxLength: 14,
                     validator: (value) {
                       if (value!.length < 13) {
+                        numeroZapController.updateMask("(00)0000-00000");
                         return "Número muito curto";
                       } else {
                         if (value.length == 13) {
-                          numeroZapController.updateMask("(00)00000-0000");
+                          if (contador == 14) {
+                            numeroZapController.updateMask("(00)0000-00000");
+                            contador == value.length;
+                            print("TO MALUCO PIVETE $contador");
+                          } else {
+                            numeroZapController.updateMask("(00)00000-0000");
+                          }
+                        } else if (value.length == 14) {
+                          numeroZapController.updateMask("(00)0000-00000");
+                          contador = value.length;
                         }
                         contador = value.length;
                         print(contador);
@@ -450,26 +492,33 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   ///Cria o PDF decodificando o base64 que vem do VRM
-  Future<String> createPdf(String retornoServidor) async {
-    var nomeArquivo = retornoServidor.substring(1, 10);
+  Future<String> createPdf(String retornoServidor, [bool? itsVenda]) async {
+    var nomeArquivo =
+        DateTime.now().toString().replaceAll(RegExp(r'[^0-9]'), '');
+    //var nomeArquivo = retornoServidor.substring(1, 10);
     var bytes = base64Decode(retornoServidor);
     var output = Platform.isAndroid
         ? await getExternalStorageDirectory()
         : await getApplicationDocumentsDirectory();
-    final file = File("${output!.path}/${nomeArquivo}_orcamento.pdf");
+    //Aqui vai o ponto para trnasformar em orçamento ou em venda rapida.
+    final file = itsVenda == null
+        ? File("${output!.path}/${nomeArquivo}_orcamento.pdf")
+        : File("${output!.path}/${nomeArquivo}_venda.pdf");
     await file.writeAsBytes(bytes.buffer.asUint8List());
     setState(() {});
-    return "${output.path}/${nomeArquivo}_orcamento.pdf";
+    return itsVenda == null
+        ? "${output.path}/${nomeArquivo}_orcamento.pdf"
+        : "${output.path}/${nomeArquivo}_venda.pdf";
   }
 
   ///Compartilha o arquivo via Zap sem precisar do contato salvo = SÓ ANDROID
   Future<void> shareFileViaZap(String path) async {
     var telefone = '75';
     print(path);
-    await WhatsappShare.shareFile(
+    /*await WhatsappShare.shareFile(
       phone: "55$telefone",
       filePath: [path],
-    );
+    );*/
   }
 
   _downloadTask(urlDownload) async {

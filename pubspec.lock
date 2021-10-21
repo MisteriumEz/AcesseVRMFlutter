@@ -461,7 +461,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.11"
+    version: "6.0.12"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -532,13 +532,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.13"
-  whatsapp_share2:
-    dependency: "direct main"
-    description:
-      name: whatsapp_share2
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.2"
   win32:
     dependency: transitive
     description:
